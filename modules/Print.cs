@@ -11,15 +11,16 @@ namespace modules
 	/// <summary>
 	/// Description of Print.
 	/// </summary>
-	public class Print
+	public class Print : Actor
 	{
-		public Income<int> all = new Income<int>();
+		public Income<int> all;
 		
 		public Trigger bang;
 		
 		public Print()
 		{
-			this.bang = new Trigger( () => {
+			all = new Income<int>(Id);
+			this.bang = new Trigger(Id, () => {
 			                        	Console.WriteLine(all.Get());
 			                        });
 		}

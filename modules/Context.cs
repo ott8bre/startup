@@ -21,36 +21,60 @@ namespace modules
 		
 		private Dictionary<long, List<long>> map = new Dictionary<long, List<long>>();
 		
-		public static void Bind( Outgo o, Income i){
+		protected static bool Bind( Outgo o, Income i){
 			if(!ctx.map.ContainsKey(o.Id)){
 				ctx.map[o.Id] = new List<long>();
 			}
 			if(!ctx.map[o.Id].Contains(i.Id)){
 				ctx.map[o.Id].Add(i.Id);
 			}			
-		}
-		/*
-		public static void Bind<T>( Outgo<T> o, Income<T> i){
-			Bind((Outgo)o,(Income)i);
-		}
-		*/
-		public static bool Step()
-		{
-			if(ctx.queue.Count>0){
-				var m = ctx.queue.Dequeue();
-				if(ctx.map.ContainsKey(m.SenderId)){
-					foreach (var id in ctx.map[m.SenderId]) {
-						((Income)Port.GetById(id)).Recv(m);
-					}
-				}
-				return true;
-			}
-			return false;
+			return true;
 		}
 		
-		public static void Enqueue(Message m)
+		public static bool Bind<O,I>( Outgo<O> o, Income<I> i){
+			// Test if convertible
+			return Bind((Outgo)o,(Income)i);
+		}
+
+		public static bool Bind( Outgo o, Trigger t){
+			// Test if convertible
+			return Bind((Outgo)o,(Income)t);
+		}
+
+		public static bool Bind( Signal s, Income i){
+			// Test if convertible
+			return Bind((Outgo)s,(Income)i);
+		}
+		
+		public static bool Step()
+		{
+			Console.WriteLine(".");
+			
+			Queue<Message> queue = ctx.queue;
+			ctx.queue = new Queue<Message>();
+			
+			int size = queue.Count;
+			while(queue.Count>0){
+				var m = queue.Dequeue();
+				if(ctx.map.ContainsKey(m.SenderId)){
+					Port p;
+					foreach (var id in ctx.map[m.SenderId]) {
+						p = Port.GetById(id);
+						
+						Console.WriteLine(m + " -> " + p);
+						
+						((Income)p).Recv(m);
+					}
+				}
+			}
+			return size>0;
+		}
+		
+		public static void Enqueue(Port p, Message m)
 		{
 			ctx.queue.Enqueue(m);
+			
+			Console.WriteLine(p + " -> " + m);
 		}
 	}
 }

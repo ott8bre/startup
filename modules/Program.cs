@@ -15,9 +15,9 @@ namespace modules
 		
 		public static void Main(string[] args)
 		{
-			var m = new Message<string>(0, "Hello World!");
+			//var m = new Message<string>(0, "Hello World!");
 
-			Outgo<int> data = new Outgo<int>() ;
+			Outgo<int> data = new Outgo<int>(0) ;
 			data.Set(4);
 			
 			Prova a = new Prova();
@@ -25,18 +25,19 @@ namespace modules
 			
 			//--
 			
-			Print p = new Print();
+			//Print p = new Print();
 			
-			Signal start = new Signal();
+			Signal start = new Signal(0, "START UP");
 			
 			Context.Bind(start, a.bang);			
 			
 			Context.Bind(data, a.in_1);
 			Context.Bind(data, a.in_2);
+			
 			Context.Bind(a.out_1, b.in_1);			
 			Context.Bind(a.out_1, b.bang);
-			Context.Bind(a.out_1, p.all);
-			Context.Bind(a.out_1, p.bang);
+			//Context.Bind(a.out_1, p.all);
+			//Context.Bind(a.out_1, p.bang);
 			
 			//Console.WriteLine(m);
 			start.Set();			
